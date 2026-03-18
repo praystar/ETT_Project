@@ -4,7 +4,7 @@ pydantic>=2.7.0               # Data validation
 pydantic-settings>=2.3.0      # Settings management via env vars
 
 # ─── LLM ─────────────────────────────────────────────────────────────────────
-openai>=1.35.0                # OpenAI Python SDK (GPT-4o, GPT-4-turbo, etc.)
+google-generativeai>=0.4.0    # Google Gemini API SDK
 
 # ─── Embeddings ───────────────────────────────────────────────────────────────
 sentence-transformers>=3.0.0  # Local embedding models (HuggingFace)
