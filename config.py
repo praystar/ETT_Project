@@ -15,12 +15,8 @@ class Settings(BaseSettings):
     )
 
     # ── LLM ──────────────────────────────────────────────────────────────────
-    OPENAI_API_KEY: str = Field(default="your-api-key-here", description="OpenAI API key")
-    OPENAI_BASE_URL: str | None = Field(
-        default=None,
-        description="Optional custom base URL (e.g. for local Ollama or Azure OpenAI)",
-    )
-    LLM_MODEL: str = Field(default="gpt-4o-mini", description="Chat model to use")
+    GEMINI_API_KEY: str = Field(default="your-api-key-here", description="Google Gemini API key")
+    LLM_MODEL: str = Field(default="gemini-2.5-pro", description="Chat model to use")
     LLM_TEMPERATURE: float = Field(default=0.2, ge=0.0, le=2.0, description="Sampling temperature")
 
     # ── Embeddings ────────────────────────────────────────────────────────────

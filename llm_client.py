@@ -1,18 +1,17 @@
 """
-llm_client.py — Thin wrapper around the OpenAI Chat Completions API.
+llm_client.py — Thin wrapper around the Google Gemini Chat API.
 
-Swap `model` in config.py to use GPT-4o, GPT-4-turbo, etc.
+Swap `model` in config.py to use gemini-2.5-pro, gemini-1.5-flash, etc.
 """
 
-from openai import OpenAI
+import google.generativeai as genai
 from config import settings
 
 
 class LLMClient:
     """
-    Handles all interactions with the LLM (OpenAI by default).
-    Easily swap for Anthropic, Cohere, or a local Ollama endpoint
-    by changing the base_url and api_key in config.
+    Handles all interactions with the LLM (Google Gemini by default).
+    Easily swap for other Gemini models by changing LLM_MODEL in config.
     """
 
     def __init__(
@@ -22,9 +21,12 @@ class LLMClient:
     ):
         self.model = model or settings.LLM_MODEL
         self.temperature = temperature if temperature is not None else settings.LLM_TEMPERATURE
-        self.client = OpenAI(
-            api_key=settings.OPENAI_API_KEY,
-            base_url=settings.OPENAI_BASE_URL or None,
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        self.client = genai.GenerativeModel(
+            model_name=self.model,
+            generation_config=genai.types.GenerationConfig(
+                temperature=self.temperature,
+            ),
         )
         print(f"🤖 LLMClient ready — model: '{self.model}', temperature: {self.temperature}")
 
@@ -39,29 +41,46 @@ class LLMClient:
         Returns:
             The model's response as a plain string.
         """
-        response = self.client.chat.completions.create(
-            model=self.model,
-            temperature=self.temperature,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": prompt},
+        # Gemini uses system instruction separately from message history
+        response = self.client.generate_content(
+            contents=[
+                genai.types.Content(parts=[genai.types.Part(
+                    text=f"{system}\n\n{prompt}"
+                )]),
             ],
+            stream=False,
         )
-        return response.choices[0].message.content.strip()
+        return response.text.strip()
 
     def chat(self, messages: list[dict]) -> str:
         """
         Multi-turn chat with a full message history.
 
         Args:
-            messages: List of {"role": "user"|"assistant"|"system", "content": str}
+            messages: List of {"role": "user"|"assistant"|"model", "content": str}
 
         Returns:
             The model's reply as a plain string.
         """
-        response = self.client.chat.completions.create(
-            model=self.model,
-            temperature=self.temperature,
-            messages=messages,
+        # Convert OpenAI-style messages to Gemini format
+        gemini_messages = []
+        for msg in messages:
+            role = msg["role"]
+            # Gemini uses "model" instead of "assistant"
+            if role == "assistant":
+                role = "model"
+            elif role == "system":
+                # System messages should be combined with user messages in Gemini
+                continue
+            gemini_messages.append(
+                genai.types.Content(
+                    parts=[genai.types.Part(text=msg["content"])],
+                    role=role,
+                )
+            )
+        
+        response = self.client.generate_content(
+            contents=gemini_messages,
+            stream=False,
         )
-        return response.choices[0].message.content.strip()
+        return response.text.strip()
