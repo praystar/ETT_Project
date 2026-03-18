@@ -1,21 +1,21 @@
 # ─── Core ────────────────────────────────────────────────────────────────────
-python-dotenv>=1.0.1          # Load .env files
-pydantic>=2.7.0               # Data validation
-pydantic-settings>=2.3.0      # Settings management via env vars
+python-dotenv>=1.0.1
+pydantic>=2.7.0
+pydantic-settings>=2.3.0
 
 # ─── LLM ─────────────────────────────────────────────────────────────────────
-google-generativeai>=0.4.0    # Google Gemini API SDK
+groq>=1.1.0
 
 # ─── Embeddings ───────────────────────────────────────────────────────────────
-sentence-transformers>=3.0.0  # Local embedding models (HuggingFace)
-torch>=2.3.0                  # PyTorch backend for sentence-transformers
+sentence-transformers>=3.0.0
+torch>=2.3.0
 
 # ─── Vector Database ─────────────────────────────────────────────────────────
-chromadb>=0.5.0               # Embedded vector DB with persistence
+chromadb>=0.5.0
 
 # ─── Utilities ────────────────────────────────────────────────────────────────
-numpy>=1.26.0                 # Array operations for embeddings
-tqdm>=4.66.0                  # Progress bars
+numpy>=1.26.0
+tqdm>=4.66.0
 
 # ─── Dev / Testing ────────────────────────────────────────────────────────────
 pytest>=8.2.0
