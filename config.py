@@ -30,6 +30,12 @@ class Settings(BaseSettings):
     CHROMA_PERSIST_DIR: str = Field(default="./chroma_db", description="Directory for ChromaDB persistence")
     CHROMA_COLLECTION: str = Field(default="rag_docs", description="ChromaDB collection name")
 
+    # ── Document Loading ───────────────────────────────────────────────────────
+    DOCUMENTS_DIR: str = Field(default="./documents", description="Directory where user places PDFs/DOCX/TXT files")
+    CHUNK_SIZE: int = Field(default=500, description="Approximate words per document chunk")
+    CHUNK_OVERLAP: int = Field(default=50, description="Words to overlap between chunks")
+    WATCH_ENABLED: bool = Field(default=True, description="Enable folder watching for new documents")
+
 
 # Singleton — import `settings` everywhere
 settings = Settings()

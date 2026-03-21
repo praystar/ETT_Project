@@ -15,13 +15,18 @@ A simple, well-structured **Retrieval-Augmented Generation (RAG)** project that 
 
 ```
 llm-vector-project/
-├── main.py           # RAG pipeline entry point
-├── vector_store.py   # ChromaDB wrapper (upsert, query, delete)
-├── embeddings.py     # SentenceTransformer embedding model
-├── llm_client.py     # OpenAI chat completions wrapper
-├── config.py         # Centralised settings (env vars)
-├── requirements.txt  # All dependencies
-├── .env.example      # Environment variable template
+├── main.py                 # RAG pipeline entry point
+├── document_loader.py      # Extract & chunk PDFs/DOCX/TXT
+├── watch_documents.py      # Optional: continuous folder monitoring
+├── vector_store.py         # ChromaDB wrapper (upsert, query, delete)
+├── embeddings.py           # SentenceTransformer embedding model
+├── llm_client.py           # OpenAI chat completions wrapper
+├── config.py               # Centralised settings (env vars)
+├── requirements.txt        # All dependencies
+├── documents/              # 📁 Drop your PDFs/DOCX/TXT files here
+│   └── (your documents)
+├── chroma_db/              # ChromaDB persistence
+├── .env.example            # Environment variable template
 └── tests/
     └── test_vector_store.py
 ```
@@ -51,16 +56,140 @@ python main.py
 
 # Interactive mode
 python main.py --interactive
+
+# Use sample documents if folder is empty
+python main.py --samples
 ```
 
-### 4. Run tests
+### 4. Add your own documents
+
+Place PDF, DOCX, or TXT files in the `./documents/` directory:
+
+```bash
+# Example: Add documents to the folder
+cp ~/Downloads/my_paper.pdf ./documents/
+cp ~/Downloads/my_notes.docx ./documents/
+echo "Some important text" > ./documents/notes.txt
+
+# Run the pipeline — it will automatically load them
+python main.py
+```
+
+The system will:
+1. ✅ Scan the `./documents/` folder recursively
+2. ✅ Extract text from PDFs, DOCX, and TXT files
+3. ✅ Split large documents into chunks (~500 words each)
+4. ✅ Generate embeddings and store in ChromaDB
+5. ✅ Make them searchable via RAG queries
+
+**Optional: Continuous watching** — monitor the folder for new files and auto-import:
+```bash
+# This watches the document folder in real-time
+python watch_documents.py
+```
+
+### 5. Run tests
 ```bash
 pytest tests/ -v
 ```
 
 ---
 
+## Document Ingestion
+
+### Supported Formats
+- **PDF** (`.pdf`) — text extraction via `pypdf`
+- **DOCX** (`.docx`) — text extraction via `python-docx`
+- **TXT** (`.txt`) — plain text files
+
+### Folder Structure
+```
+.
+├── documents/              # Drop your files here
+│   ├── research_paper.pdf
+│   ├── notes.docx
+│   └── summary.txt
+├── main.py
+└── watch_documents.py
+```
+
+### Configuration
+
+Adjust document processing in `.env`:
+```bash
+DOCUMENTS_DIR=./documents          # Where to scan for files
+CHUNK_SIZE=500                     # Words per chunk (≈270 tokens)
+CHUNK_OVERLAP=50                   # Overlap between chunks for context
+WATCH_ENABLED=True                 # Enable folder watching
+```
+
+### How Ingestion Works
+
+```
+Document → Extract Text → Chunk → Embed → Store in ChromaDB
+  .pdf      pypdf        500w     MiniLM      ↓
+  .docx     python-docx   +50     384-dim   Query &
+  .txt      raw read      overlap   ↓       Retrieve
+                                  [vec1,
+                                   vec2, ...]
+```
+
+Each chunk gets a unique ID: `{filename}_{chunk_index}_{hash}` for tracking.
+
+### Troubleshooting Documents
+
+**Issue: "No documents found"**
+- Verify files are in `./documents/` (check path)
+- Check supported formats (`.pdf`, `.docx`, `.txt` only)
+- Ensure files are readable (not corrupted)
+
+**Issue: PDF text extraction is poor**
+- Some PDFs are image-based (scanned). Current version uses text extraction only.
+- For scanned PDFs, consider OCR (future enhancement with Tesseract)
+
+**Issue: Large files take too long**
+- Chunking happens automatically. Very large PDFs may take time to process.
+- Adjust `CHUNK_SIZE` to balance context granularity vs speed.
+
+---
+
 ## How It Works
+
+```
+User Document (PDF/DOCX/TXT)
+    │
+    ▼
+DocumentLoader.load_files_from_directory()
+    │
+    ├─→ Extract text
+    ├─→ Split into chunks (~500w)
+    └─→ Generate embeddings
+         │
+         ▼
+    VectorStore.upsert() → ChromaDB
+         │
+         ▼
+User Query
+    │
+    ▼
+EmbeddingModel.embed(query)          ← sentence-transformers (local)
+    │
+    ▼
+VectorStore.query(embedding, top_k)  ← ChromaDB cosine similarity search
+    │
+    ▼
+Build prompt with retrieved context
+    │
+    ▼
+LLMClient.complete(prompt)           ← OpenAI GPT
+    │
+    ▼
+Answer
+```
+
+---
+
+## How It Works (Original)
 
 ```
 User Query
