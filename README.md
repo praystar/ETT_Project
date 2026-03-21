@@ -256,3 +256,5 @@ See `requirements.txt` for exact versions. Key packages:
 | `chromadb` | Embedded vector database |
 | `pydantic-settings` | Environment-based config |
 | `torch` | PyTorch backend for embeddings |
+
+Ingestion of documents and  both grok and gemini works 
