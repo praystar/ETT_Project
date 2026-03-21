@@ -15,9 +15,10 @@ class Settings(BaseSettings):
     )
 
     # ── LLM ──────────────────────────────────────────────────────────────────
-    GROQ_API_KEY: str = Field(default="", description="Groq API key")
-    GEMINI_API_KEY: str = Field(default="your-api-key-here", description="Google Gemini API key")
-    LLM_MODEL: str = Field(default="gemini-2.5-pro", description="Chat model to use")
+    LLM_PROVIDER: str = Field(default="groq", description="LLM provider: 'groq' or 'gemini'")
+    GROQ_API_KEY: str = Field(default="", description="GROQ API key")
+    GEMINI_API_KEY: str = Field(default="", description="Google Gemini API key")
+    LLM_MODEL: str = Field(default="gpt-oss-120b", description="Chat model to use")
     LLM_TEMPERATURE: float = Field(default=0.2, ge=0.0, le=2.0, description="Sampling temperature")
 
     # ── Embeddings ────────────────────────────────────────────────────────────
@@ -29,6 +30,12 @@ class Settings(BaseSettings):
     # ── Vector Store (ChromaDB) ───────────────────────────────────────────────
     CHROMA_PERSIST_DIR: str = Field(default="./chroma_db", description="Directory for ChromaDB persistence")
     CHROMA_COLLECTION: str = Field(default="rag_docs", description="ChromaDB collection name")
+
+    # ── Document Loading ───────────────────────────────────────────────────────
+    DOCUMENTS_DIR: str = Field(default="./documents", description="Directory where user places PDFs/DOCX/TXT files")
+    CHUNK_SIZE: int = Field(default=500, description="Approximate words per document chunk")
+    CHUNK_OVERLAP: int = Field(default=50, description="Words to overlap between chunks")
+    WATCH_ENABLED: bool = Field(default=True, description="Enable folder watching for new documents")
 
 
 # Singleton — import `settings` everywhere

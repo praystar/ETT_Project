@@ -7,51 +7,77 @@ questions grounded in your own documents.
 from vector_store import VectorStore
 from llm_client import LLMClient
 from embeddings import EmbeddingModel
+from document_loader import DocumentLoader
 from config import settings
 import sys
 
 
 def ingest_documents(vector_store: VectorStore, embedding_model: EmbeddingModel):
-    """Load sample documents into the vector database."""
-    documents = [
-        {
-            "id": "doc1",
-            "text": "Large language models (LLMs) are neural networks trained on massive text corpora. "
-                    "They learn statistical patterns in language and can generate coherent, context-aware text.",
-            "metadata": {"source": "ai_overview.txt", "topic": "LLM"},
-        },
-        {
-            "id": "doc2",
-            "text": "Vector databases store high-dimensional embeddings and support fast similarity search "
-                    "using algorithms like HNSW or IVF. Popular options include ChromaDB, Pinecone, and Weaviate.",
-            "metadata": {"source": "vector_db_overview.txt", "topic": "VectorDB"},
-        },
-        {
-            "id": "doc3",
-            "text": "Retrieval-Augmented Generation (RAG) combines a retriever (vector search) with a generator "
-                    "(LLM) to produce factually grounded answers without retraining the model.",
-            "metadata": {"source": "rag_paper.txt", "topic": "RAG"},
-        },
-        {
-            "id": "doc4",
-            "text": "Transformer architecture, introduced in 'Attention Is All You Need' (2017), uses "
-                    "self-attention mechanisms and is the backbone of modern LLMs like GPT, BERT, and LLaMA.",
-            "metadata": {"source": "transformers.txt", "topic": "LLM"},
-        },
-        {
-            "id": "doc5",
-            "text": "Embeddings are dense numerical representations of text. Similar texts have vectors "
-                    "that are close together in high-dimensional space, enabling semantic search.",
-            "metadata": {"source": "embeddings_guide.txt", "topic": "VectorDB"},
-        },
-    ]
+    """Load documents from the documents directory into the vector database."""
+    loader = DocumentLoader(
+        chunk_size=settings.CHUNK_SIZE,
+        chunk_overlap=settings.CHUNK_OVERLAP,
+    )
 
-    print(f"📥 Ingesting {len(documents)} documents into vector store...")
+    # Load documents from directory
+    documents = loader.load_files_from_directory(settings.DOCUMENTS_DIR)
+
+    if not documents:
+        print(
+            f"⚠️  No documents found in '{settings.DOCUMENTS_DIR}'.\n"
+            f"   📝 To get started, add PDFs, DOCX, or TXT files to that folder.\n"
+            f"   💡 Tip: You can also provide sample documents programmatically.\n"
+        )
+        # Optionally load sample documents if folder is empty
+        if "--samples" in sys.argv:
+            print("   Loading sample documents instead...\n")
+            documents = _get_sample_documents()
+        else:
+            return
+
+    print(f"📥 Ingesting {len(documents)} document chunk(s) into vector store...")
     for doc in documents:
         embedding = embedding_model.embed(doc["text"])
         vector_store.upsert(doc["id"], embedding, doc["text"], doc["metadata"])
 
     print("✅ Ingestion complete.\n")
+
+
+def _get_sample_documents():
+    """Return sample documents for demo purposes."""
+    return [
+        {
+            "id": "sample_doc1_0_demo001",
+            "text": "Large language models (LLMs) are neural networks trained on massive text corpora. "
+                    "They learn statistical patterns in language and can generate coherent, context-aware text.",
+            "metadata": {"source": "sample_ai_overview.txt", "file_type": "txt", "chunk_index": 0},
+        },
+        {
+            "id": "sample_doc2_0_demo002",
+            "text": "Vector databases store high-dimensional embeddings and support fast similarity search "
+                    "using algorithms like HNSW or IVF. Popular options include ChromaDB, Pinecone, and Weaviate.",
+            "metadata": {"source": "sample_vector_db_overview.txt", "file_type": "txt", "chunk_index": 0},
+        },
+        {
+            "id": "sample_doc3_0_demo003",
+            "text": "Retrieval-Augmented Generation (RAG) combines a retriever (vector search) with a generator "
+                    "(LLM) to produce factually grounded answers without retraining the model.",
+            "metadata": {"source": "sample_rag_paper.txt", "file_type": "txt", "chunk_index": 0},
+        },
+        {
+            "id": "sample_doc4_0_demo004",
+            "text": "Transformer architecture, introduced in 'Attention Is All You Need' (2017), uses "
+                    "self-attention mechanisms and is the backbone of modern LLMs like GPT, BERT, and LLaMA.",
+            "metadata": {"source": "sample_transformers.txt", "file_type": "txt", "chunk_index": 0},
+        },
+        {
+            "id": "sample_doc5_0_demo005",
+            "text": "Embeddings are dense numerical representations of text. Similar texts have vectors "
+                    "that are close together in high-dimensional space, enabling semantic search.",
+            "metadata": {"source": "sample_embeddings_guide.txt", "file_type": "txt", "chunk_index": 0},
+        },
+    ]
+
 
 
 def answer_question(
