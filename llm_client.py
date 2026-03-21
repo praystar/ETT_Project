@@ -9,11 +9,11 @@ class LLMClient:
         self.model = model or settings.LLM_MODEL
         self.temperature = temperature if temperature is not None else settings.LLM_TEMPERATURE
 
-        if self.provider == "grok":
+        if self.provider == "groq":
             if not settings.GROQ_API_KEY:
                 raise ValueError("GROQ_API_KEY is not set in .env file")
             self.client = Groq(api_key=settings.GROQ_API_KEY)
-            print(f"🤖 LLMClient ready — provider: Grok, model: '{self.model}', temperature: {self.temperature}")
+            print(f"🤖 LLMClient ready — provider: GROQ, model: '{self.model}', temperature: {self.temperature}")
 
         elif self.provider == "gemini":
             if not settings.GEMINI_API_KEY:
@@ -22,11 +22,11 @@ class LLMClient:
             print(f"🤖 LLMClient ready — provider: Gemini, model: '{self.model}', temperature: {self.temperature}")
 
         else:
-            raise ValueError(f"Unknown LLM_PROVIDER: {self.provider}. Use 'grok' or 'gemini'")
+            raise ValueError(f"Unknown LLM_PROVIDER: {self.provider}. Use 'groq' or 'gemini'")
 
     def complete(self, prompt: str, system: str = "You are a helpful assistant.") -> str:
         try:
-            if self.provider == "grok":
+            if self.provider == "groq":
                 chat_completion = self.client.chat.completions.create(
                     messages=[
                         {"role": "system", "content": system},
