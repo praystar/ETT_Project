@@ -4,7 +4,7 @@ A simple, well-structured **Retrieval-Augmented Generation (RAG)** project that 
 
 | Component | Technology |
 |---|---|
-| 🤖 Large Language Model | OpenAI GPT-4o-mini (swappable) |
+| 🤖 Large Language Model | Groq or Google Gemini (swappable) |
 | 🔠 Embeddings | `sentence-transformers/all-MiniLM-L6-v2` (local) |
 | 🗄️ Vector Database | ChromaDB (embedded, persistent) |
 | ⚙️ Config | `pydantic-settings` + `.env` |
@@ -14,19 +14,20 @@ A simple, well-structured **Retrieval-Augmented Generation (RAG)** project that 
 ## Project Structure
 
 ```
-llm-vector-project/
+ETT_Project/
 ├── main.py                 # RAG pipeline entry point
 ├── document_loader.py      # Extract & chunk PDFs/DOCX/TXT
 ├── watch_documents.py      # Optional: continuous folder monitoring
 ├── vector_store.py         # ChromaDB wrapper (upsert, query, delete)
 ├── embeddings.py           # SentenceTransformer embedding model
-├── llm_client.py           # OpenAI chat completions wrapper
+├── llm_client.py           # Groq/Gemini chat completions wrapper
 ├── config.py               # Centralised settings (env vars)
 ├── requirements.txt        # All dependencies
 ├── documents/              # 📁 Drop your PDFs/DOCX/TXT files here
 │   └── (your documents)
 ├── chroma_db/              # ChromaDB persistence
 ├── .env.example            # Environment variable template
+├── SETUP_GEMINI.md         # Gemini setup guide
 └── tests/
     └── test_vector_store.py
 ```
@@ -38,7 +39,7 @@ llm-vector-project/
 ### 1. Clone & install
 ```bash
 git clone <your-repo>
-cd llm-vector-project
+cd ETT_Project
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -46,7 +47,7 @@ pip install -r requirements.txt
 ### 2. Configure environment
 ```bash
 cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
+# Edit .env and add your API key (GROQ_API_KEY or GEMINI_API_KEY)
 ```
 
 ### 3. Run the pipeline
@@ -181,30 +182,7 @@ VectorStore.query(embedding, top_k)  ← ChromaDB cosine similarity search
 Build prompt with retrieved context
     │
     ▼
-LLMClient.complete(prompt)           ← OpenAI GPT
-    │
-    ▼
-Answer
-```
-
----
-
-## How It Works (Original)
-
-```
-User Query
-    │
-    ▼
-EmbeddingModel.embed(query)          ← sentence-transformers (local)
-    │
-    ▼
-VectorStore.query(embedding, top_k)  ← ChromaDB cosine similarity search
-    │
-    ▼
-Build prompt with retrieved context
-    │
-    ▼
-LLMClient.complete(prompt)           ← OpenAI GPT
+LLMClient.complete(prompt)           ← Groq or Gemini
     │
     ▼
 Answer
@@ -214,22 +192,26 @@ Answer
 
 ## Swapping Components
 
-**Different LLM** — change `LLM_MODEL` in `.env`:
+**Different LLM provider** — change `LLM_PROVIDER` in `.env`:
 ```
-LLM_MODEL=gpt-4o          # More capable, higher cost
-LLM_MODEL=gpt-3.5-turbo   # Faster, cheaper
+LLM_PROVIDER=groq          # Use Groq API
+LLM_PROVIDER=gemini        # Use Google Gemini API
 ```
 
-**Local LLM via Ollama** — set the base URL:
+**Different LLM model** — change `LLM_MODEL` in `.env`:
 ```
-OPENAI_BASE_URL=http://localhost:11434/v1
-LLM_MODEL=llama3
-OPENAI_API_KEY=ollama       # dummy value
+# For Groq
+LLM_MODEL=gpt-oss-120b     # Default Groq model
+LLM_MODEL=llama3-70b-8192  # Alternative Groq model
+
+# For Gemini
+LLM_MODEL=gemini-2.0-flash-exp  # Default Gemini model
 ```
 
 **Different embedding model**:
 ```
-EMBEDDING_MODEL=all-mpnet-base-v2   # Stronger, 768-dim
+EMBEDDING_MODEL=all-MiniLM-L6-v2         # Default, 384-dim
+EMBEDDING_MODEL=all-mpnet-base-v2        # Stronger, 768-dim
 EMBEDDING_MODEL=paraphrase-MiniLM-L3-v2  # Faster, smaller
 ```
 
@@ -251,10 +233,11 @@ See `requirements.txt` for exact versions. Key packages:
 
 | Package | Purpose |
 |---|---|
-| `openai` | LLM API client |
+| `groq` | Groq LLM API client |
+| `google-genai` | Google Gemini API client |
 | `sentence-transformers` | Local embedding models |
 | `chromadb` | Embedded vector database |
 | `pydantic-settings` | Environment-based config |
 | `torch` | PyTorch backend for embeddings |
 
-Ingestion of documents and  both grok and gemini works 
+Ingestion of documents works with both Groq and Gemini.
