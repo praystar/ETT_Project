@@ -11,10 +11,10 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-from document_loader import DocumentLoader
-from vector_store import VectorStore
-from embeddings import EmbeddingModel
-from config import settings
+from rag_pipeline.document_loader import DocumentLoader
+from rag_pipeline.vector_store import VectorStore
+from rag_pipeline.embeddings import EmbeddingModel
+from rag_pipeline.config import settings
 
 
 class DocumentWatcher:

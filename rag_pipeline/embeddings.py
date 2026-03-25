@@ -7,7 +7,7 @@ Swap for 'text-embedding-3-small' via OpenAI if you prefer a hosted model.
 
 from typing import List
 from sentence_transformers import SentenceTransformer
-from config import settings
+from .config import settings
 
 
 class EmbeddingModel:

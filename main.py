@@ -4,11 +4,11 @@ Combines a Vector Database (ChromaDB) with an LLM (OpenAI) to answer
 questions grounded in your own documents.
 """
 
-from vector_store import VectorStore
-from llm_client import LLMClient
-from embeddings import EmbeddingModel
-from document_loader import DocumentLoader
-from config import settings
+from rag_pipeline.vector_store import VectorStore
+from rag_pipeline.llm_client import LLMClient
+from rag_pipeline.embeddings import EmbeddingModel
+from rag_pipeline.document_loader import DocumentLoader
+from rag_pipeline.config import settings
 import sys
 
 

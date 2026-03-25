@@ -1,6 +1,6 @@
 from groq import Groq
 import google.genai as genai
-from config import settings
+from .config import settings
 
 
 class LLMClient:
