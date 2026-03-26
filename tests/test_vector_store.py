@@ -4,7 +4,7 @@ Run with: pytest tests/ -v
 """
 
 import pytest
-from vector_store import VectorStore
+from rag_pipeline.vector_store import VectorStore
 
 
 @pytest.fixture
