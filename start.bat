@@ -5,7 +5,7 @@ echo.
 echo 🚀 Starting RAG Chatbot with Frontend...
 echo.
 
-REM Check if .env exists
+REM Check if .env exists (at project root)
 if not exist ".env" (
     echo ⚠️  No .env file found!
     echo 📝 Creating .env from .env.example...
@@ -31,7 +31,9 @@ echo.
 
 REM Start Flask backend
 echo 🔧 Starting Flask backend...
+cd backend
 start python app.py
+cd ..
 
 REM Wait for Flask to start
 timeout /t 2 /nobreak
@@ -42,7 +44,7 @@ echo.
 REM Open frontend in browser
 echo 🌐 Opening frontend...
 for /f "delims=" %%A in ('cd') do set "CURRENT_DIR=%%A"
-set "FRONTEND_PATH=%CURRENT_DIR%\frontend.html"
+set "FRONTEND_PATH=%CURRENT_DIR%\frontend\index.html"
 
 start "" "%FRONTEND_PATH%"
 

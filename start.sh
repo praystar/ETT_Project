@@ -6,7 +6,7 @@ set -e
 echo "🚀 Starting RAG Chatbot with Frontend..."
 echo
 
-# Check if .env exists
+# Check if .env exists (at project root)
 if [ ! -f ".env" ]; then
     echo "⚠️  No .env file found!"
     echo "📝 Creating .env from .env.example..."
@@ -23,7 +23,7 @@ fi
 # Check if Python venv is activated
 if [ -z "$VIRTUAL_ENV" ]; then
     echo "⚠️  Virtual environment not activated"
-    echo "💡 Run: source .venv/bin/activate (or .venv\\Scripts\\activate on Windows)"
+    echo "💡 Run: source .venv/bin/activate"
     echo
 fi
 
@@ -38,8 +38,10 @@ echo
 
 # Start Flask backend in background
 echo "🔧 Starting Flask backend..."
+cd backend
 python app.py &
 FLASK_PID=$!
+cd ..
 
 # Wait for Flask to start
 sleep 2
@@ -55,7 +57,7 @@ echo
 
 # Open frontend in browser
 echo "🌐 Opening frontend..."
-FRONTEND_PATH="$(pwd)/frontend.html"
+FRONTEND_PATH="$(pwd)/frontend/index.html"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS

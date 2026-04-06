@@ -4,6 +4,7 @@ config.py — Centralised settings loaded from environment variables or a .env f
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
+from pathlib import Path
 
 
 class Settings(BaseSettings):

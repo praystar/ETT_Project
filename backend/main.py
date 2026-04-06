@@ -1,6 +1,6 @@
 """
 RAG (Retrieval-Augmented Generation) Pipeline
-Combines a Vector Database (ChromaDB) with an LLM (OpenAI) to answer
+Combines a Vector Database (ChromaDB) with an LLM (Groq/Gemini) to answer
 questions grounded in your own documents.
 """
 
