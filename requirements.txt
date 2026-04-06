@@ -12,8 +12,9 @@ groq>=1.1.0
 google-genai>=0.1.0
 
 # ─── Embeddings ───────────────────────────────────────────────────────────────
+# CPU-only PyTorch (smaller download ~150MB instead of 2GB+)
+torch==2.3.1 ; sys_platform == "linux" and platform_machine == "x86_64"
 sentence-transformers>=3.0.0
-torch>=2.3.0
 
 # ─── Vector Database ─────────────────────────────────────────────────────────
 chromadb>=0.5.0
@@ -22,11 +23,3 @@ chromadb>=0.5.0
 pypdf>=4.0.0
 python-docx>=0.8.11
 watchdog>=3.0.0
-
-# ─── Utilities ────────────────────────────────────────────────────────────────
-numpy>=1.26.0
-tqdm>=4.66.0
-
-# ─── Dev / Testing ────────────────────────────────────────────────────────────
-pytest>=8.2.0
-pytest-asyncio>=0.23.0
