@@ -3,7 +3,7 @@ Flask API server for the RAG Chatbot
 Exposes REST endpoints to ingest documents and query the chatbot.
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from vector_store import VectorStore
 from llm_client import LLMClient
@@ -11,9 +11,13 @@ from embeddings import EmbeddingModel
 from document_loader import DocumentLoader
 from config import settings
 import os
+from pathlib import Path
 
 app = Flask(__name__)
 CORS(app)
+
+# Get the relative path to frontend directory
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), '..', 'frontend')
 
 # Global state
 _embedding_model = None
@@ -217,6 +221,19 @@ def _get_sample_documents():
             "metadata": {"source": "sample_embeddings_guide.txt", "file_type": "txt", "chunk_index": 0},
         },
     ]
+
+
+# ── Frontend Routes ───────────────────────────────────────────────────────
+@app.route("/")
+def serve_index():
+    """Serve the frontend HTML."""
+    return send_from_directory(FRONTEND_DIR, "index.html")
+
+
+@app.route("/<path:filename>")
+def serve_static(filename):
+    """Serve static files from the frontend directory."""
+    return send_from_directory(FRONTEND_DIR, filename)
 
 
 if __name__ == "__main__":
