@@ -92,7 +92,7 @@ class VectorStore:
         """Return the number of documents in the collection."""
         return self.collection.count()
 
-    def reset(self) -> None:
+    def delete_all(self) -> None:
         """Delete all documents from the collection."""
         self.client.delete_collection(self.collection.name)
         self.collection = self.client.get_or_create_collection(
