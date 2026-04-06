@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = Field(default="groq", description="LLM provider: 'groq' or 'gemini'")
     GROQ_API_KEY: str = Field(default="", description="GROQ API key")
     GEMINI_API_KEY: str = Field(default="", description="Google Gemini API key")
-    LLM_MODEL: str = Field(default="gpt-oss-120b", description="Chat model to use")
+    LLM_MODEL: str = Field(default="openai/gpt-oss-120b", description="Chat model to use")
     LLM_TEMPERATURE: float = Field(default=0.2, ge=0.0, le=2.0, description="Sampling temperature")
 
     # ── Embeddings ────────────────────────────────────────────────────────────
